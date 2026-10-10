@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Mini Quiz Battle — Play to Win</title>
+<style>
+:root{--m:#7a0c2e;--g:#d4a72c;--c:#fff8e8;--d:#211b1d;--ok:#16804a;--no:#c62828;--blue:#2857a8}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#42051a,#7a0c2e,#24141b);font-family:Arial,sans-serif;color:var(--d);min-height:100vh}.wrap{max-width:1180px;margin:auto;padding:22px}.card{background:#fffaf0;border-radius:22px;padding:26px;box-shadow:0 18px 50px #0006}.hidden{display:none}.brand{color:var(--g);font-weight:900;letter-spacing:2px}.muted{opacity:.7}.row{display:flex;gap:16px;flex-wrap:wrap}.col{flex:1;min-width:260px}input,select{width:100%;padding:13px;margin:6px 0 12px;border:2px solid #ddd;border-radius:11px}.btn{border:0;border-radius:11px;padding:13px 18px;font-weight:800;cursor:pointer}.primary{background:var(--m);color:white}.gold{background:var(--g)}.danger{background:#8d1730;color:white}.ghost{background:#eee}.blue{background:var(--blue);color:#fff}.code{font-size:38px;font-weight:900;letter-spacing:7px;color:var(--m)}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.scores{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin:18px 0}.team{text-align:center;background:#f3e8d1;border:3px solid transparent;border-radius:18px;padding:16px}.score{font-size:48px;font-weight:900;color:var(--m)}.vs{font-size:22px;font-weight:900}.q{font-size:28px;font-weight:900;line-height:1.3;margin:20px 0}.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}.opt{padding:17px;border:2px solid #ddd;border-radius:13px;background:white;font-weight:800;text-align:left;cursor:pointer}.opt.sel{border-color:var(--m);background:#f5dfe7}.opt.correct{border-color:var(--ok);background:#dff3e8}.opt.wrong{border-color:var(--no);background:#ffe1e1}.timer{text-align:center;font-size:52px;font-weight:900;color:var(--m)}.center{text-align:center}.pill{display:inline-block;background:#eee;padding:7px 11px;border-radius:99px;margin:3px;font-weight:800}.explain{margin-top:14px;background:#f5eddb;border-left:5px solid var(--g);padding:14px;border-radius:8px}
+.round-result{margin:18px auto;padding:18px 20px;max-width:900px;text-align:center;border:2px solid #d4a72c;border-radius:18px;background:linear-gradient(135deg,#fff4d4,#f3e4c3);box-shadow:0 8px 22px #7a0c2e18}
+.round-result .result-title{font-size:clamp(16px,2vw,22px);font-weight:900;letter-spacing:1px;color:#7a0c2e}
+.round-result .result-score{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:12px 0}
+.round-result .result-team{min-width:150px;padding:10px 16px;border-radius:12px;background:#fffaf0;border:1px solid #e5d2a7}
+.round-result .result-team b{display:block;font-size:14px;color:#7a0c2e}
+.round-result .result-team strong{display:block;font-size:clamp(28px,4vw,42px);color:#7a0c2e}
+.round-result .result-note{font-weight:800;color:#4b2632}
+.round-result{max-width:1100px;padding:26px 22px;border-width:3px;background:radial-gradient(circle at 50% 0%,#fff9e8 0%,#f7e6bd 65%,#ecd29a 100%);box-shadow:0 0 0 5px #d4a72c25,0 12px 30px #7a0c2e20}
+.round-result .result-title{font-size:clamp(20px,3vw,30px);letter-spacing:2px}
+.round-result .result-team{min-width:190px;padding:14px 22px}
+.round-result .result-team b{font-size:16px}
+.round-result .result-team strong{font-size:clamp(38px,5vw,58px)}
+.round-result .winner-banner{position:relative;overflow:hidden;margin:20px auto 2px;padding:20px 18px;border:3px solid #ffe27a;border-radius:20px;max-width:850px;color:#fff7cc;background:linear-gradient(120deg,#4a061b,#8b0d36,#51051f);box-shadow:0 0 0 5px #d4a72c35,0 0 30px #e4b93c70,0 12px 24px #7a0c2e30;animation:winnerReveal .75s cubic-bezier(.2,.9,.25,1.2) both}
+.round-result .winner-banner:after{content:"";position:absolute;inset:-50%;background:linear-gradient(110deg,transparent 40%,#fff9cf55 49%,#fff 50%,#fff9cf55 51%,transparent 60%);transform:translateX(-80%);animation:winnerShine 2.4s ease-in-out .2s 2}
+.round-result .winner-kicker,.round-result .winner-name,.round-result .winner-sub{position:relative;z-index:1}
+.round-result .winner-kicker{font-size:clamp(15px,2vw,21px);font-weight:1000;letter-spacing:4px;color:#ffe27a}
+.round-result .winner-name{font-size:clamp(34px,6vw,66px);font-weight:1000;line-height:1.08;margin:8px 0;text-shadow:0 0 8px #ffe27a99,0 0 24px #d4a72c88}
+.round-result .winner-sub{font-size:clamp(14px,2vw,19px);font-weight:800;color:#fff}
+.round-result .tie-banner{font-size:clamp(18px,3vw,28px);font-weight:1000;color:#7a0c2e;background:#fff1bf;border:2px dashed #d4a72c;border-radius:15px;padding:18px;margin-top:18px}
+@keyframes winnerReveal{from{opacity:0;transform:translateY(18px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes winnerShine{0%{transform:translateX(-80%)}70%,100%{transform:translateX(80%)}}
+@media(prefers-reduced-motion:reduce){.round-result .winner-banner,.round-result .winner-banner:after{animation:none}}
+
+.answer-review{margin-top:28px;border-top:1px solid #dfd3bf;padding-top:14px}.answer-review summary{cursor:pointer;font-weight:800;color:#7a0c2e;padding:12px 14px;border-radius:10px;background:#f3e8d1;list-style-position:inside}.answer-review[open] summary{margin-bottom:10px;background:#ead7b2}.answer-review .mini{margin:8px 4px}
+
+/* v12: high-contrast answer reveal, without glare or oversized text */
+.answer-reveal{overflow:hidden;background:linear-gradient(135deg,#650a2a,#7a0c2e);box-shadow:0 8px 22px #0002;animation:answerPop .35s ease-out both}
+.answer-reveal:before{display:none!important;animation:none!important;content:none!important}
+.answer-reveal .reveal-kicker{font-size:clamp(14px,1.6vw,18px);letter-spacing:2px;color:#ffe68a}
+.answer-reveal .reveal-choice{font-size:clamp(24px,3.2vw,42px);font-weight:900;line-height:1.25;margin:10px 0;color:#fff4c9;text-shadow:none;overflow-wrap:anywhere;word-break:normal}
+.answer-reveal .reveal-text{font-size:clamp(17px,2vw,23px);line-height:1.25}
+.answer-reveal .reveal-explanation{font-size:clamp(13px,1.4vw,16px);line-height:1.45;margin-top:10px;overflow-wrap:anywhere}
+.answer-reveal .sparkle{animation:none}
+.opt.correct{box-shadow:none!important;transform:none!important;animation:none!important}
+.answer-reveal{position:relative;overflow:hidden;text-align:center;margin:24px auto 18px;padding:28px 24px;max-width:900px;border:3px solid #f4cf58;border-left:3px solid #f4cf58;border-radius:22px;color:#fff;background:radial-gradient(circle at 50% 0%,#a52b51 0%,#7a0c2e 52%,#350516 100%);box-shadow:0 0 0 5px #d4a72c30,0 0 28px #f2c94c88,0 14px 32px #0003;animation:answerPop .65s cubic-bezier(.2,.9,.25,1.2) both}
+.answer-reveal:before{content:"";position:absolute;inset:-50%;background:linear-gradient(115deg,transparent 38%,#fff7b055 48%,#fff 50%,#fff7b055 52%,transparent 62%);transform:translateX(-70%) rotate(8deg);animation:answerShine 2.4s ease-in-out .3s 2}
+.answer-reveal .reveal-kicker,.answer-reveal .reveal-choice,.answer-reveal .reveal-text,.answer-reveal .reveal-explanation{position:relative;z-index:1}
+.answer-reveal .reveal-kicker{font-size:clamp(15px,2vw,21px);font-weight:900;letter-spacing:3px;color:#ffe68a;text-transform:uppercase}
+.answer-reveal .reveal-choice{font-size:clamp(34px,5vw,58px);font-weight:1000;line-height:1.15;margin:12px 0;color:#fff8c9;text-shadow:0 0 8px #ffe68a,0 0 22px #ffdb55,0 4px 0 #5d0822}
+.answer-reveal .reveal-text{font-size:clamp(20px,3vw,30px);font-weight:900;line-height:1.3}
+.answer-reveal .reveal-explanation{font-size:clamp(14px,1.8vw,18px);line-height:1.5;margin-top:14px;color:#fff5e0}
+.answer-reveal .sparkle{display:inline-block;margin:0 8px;animation:sparklePulse .8s ease-in-out infinite alternate}
+.opt.correct{border:3px solid #169b58!important;background:linear-gradient(135deg,#e3ffed,#b8f5cf)!important;color:#075c32;box-shadow:0 0 0 3px #20b86b22,0 0 18px #24c87580;transform:scale(1.025);animation:correctPulse 1.2s ease-in-out infinite alternate}
+@keyframes answerPop{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes answerShine{0%{transform:translateX(-70%) rotate(8deg)}70%,100%{transform:translateX(70%) rotate(8deg)}}
+@keyframes sparklePulse{from{transform:scale(.8) rotate(-8deg);opacity:.7}to{transform:scale(1.2) rotate(8deg);opacity:1}}
+@keyframes correctPulse{from{box-shadow:0 0 0 2px #20b86b22,0 0 10px #24c87545}to{box-shadow:0 0 0 4px #20b86b35,0 0 20px #24c87590}}
+@media(prefers-reduced-motion:reduce){.answer-reveal,.answer-reveal:before,.answer-reveal .sparkle,.opt.correct{animation:none}}
+.notice{padding:12px;border-radius:10px;background:#f5eddb;margin:12px 0}.ok{color:var(--ok);font-weight:900}.bad{color:var(--no);font-weight:900}.table{width:100%;border-collapse:collapse;margin-top:12px}.table th,.table td{padding:9px;border-bottom:1px solid #ddd;text-align:left}.winner{font-size:42px;color:var(--m);font-weight:900}.bracket{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:16px 0}.box{background:#f3e8d1;border-radius:14px;padding:14px;text-align:center}.box b{display:block;color:var(--m);margin-bottom:7px}.mini{font-size:13px;opacity:.75}.locked{opacity:.55;pointer-events:none}@media(max-width:700px){.opts{grid-template-columns:1fr}.scores,.bracket{grid-template-columns:1fr}.vs{display:none}.q{font-size:22px}.code{font-size:30px}}
+
+/* MINI QUIZ BATTLE v13 — public-facing reusable landing screen */
+body{background:radial-gradient(ellipse at 12% 5%,#a62a53 0%,transparent 32%),radial-gradient(ellipse at 90% 95%,#b68b22 0%,transparent 28%),linear-gradient(135deg,#190711 0%,#4b0923 48%,#21121d 100%)}
+#home.card{position:relative;isolation:isolate;overflow:hidden;max-width:1120px;margin:28px auto;padding:clamp(24px,4vw,48px);border:1px solid #f1d58b;background:linear-gradient(135deg,#fffaf0f7,#fff3dff7);box-shadow:0 25px 80px #0007}
+#home:before{content:"";position:absolute;z-index:-1;top:-130px;right:-100px;width:360px;height:360px;border-radius:50%;border:1px solid #d4a72c55;box-shadow:0 0 0 22px #d4a72c0c,0 0 0 48px #7a0c2e08}
+#home:after{content:"✦";position:absolute;z-index:-1;right:7%;top:16%;font-size:clamp(90px,15vw,180px);line-height:1;color:#d4a72c16;transform:rotate(12deg)}
+#home .brand{display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border:1px solid #d4a72c66;border-radius:99px;background:#fff4d9;color:#7a0c2e;font-size:12px;letter-spacing:2.2px}
+#home .hero-title{font-size:clamp(40px,7vw,76px);line-height:.98;letter-spacing:-2px;margin:26px 0 14px;color:#290b19}
+#home .hero-title span{display:block;color:#7a0c2e}
+#home .hero-copy{font-size:clamp(16px,2vw,20px);max-width:650px;line-height:1.6;color:#6a5960}
+#home .hero-chips{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0 30px}
+#home .hero-chip{border:1px solid #e3d0aa;border-radius:99px;background:#fffdf7;padding:8px 12px;font-size:12px;font-weight:800;color:#633044}
+#home .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+#home .mode-panel{border:1px solid #e6d3ab;border-radius:20px;padding:22px;background:#fffdf8;box-shadow:0 8px 22px #6c18300b}
+#home .mode-panel.host{background:linear-gradient(145deg,#fff6dd,#fffdf7)}
+#home .mode-panel h2{margin:0 0 8px;font-size:22px;color:#4a0a22}
+#home .mode-panel p{color:#76656b;line-height:1.5}
+#home .mode-icon{display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:14px;background:#7a0c2e;color:#ffe28a;font-size:23px;margin-bottom:15px}
+#home .mode-panel .btn{width:100%;margin-top:8px;padding:15px 18px;font-size:14px;letter-spacing:.4px;transition:transform .15s ease,box-shadow .15s ease}
+#home .mode-panel .btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px #7a0c2e22}
+#home .join-fields{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+#home .join-fields input:first-child{grid-column:1/-1}
+#home .join-fields input,#home .join-fields select{background:white}
+#home .format-strip{display:flex;gap:10px;align-items:center;margin-top:22px;padding:13px 15px;border-radius:14px;background:#f5ead1;color:#6c4b42;font-size:13px;line-height:1.5}
+#home .format-strip strong{color:#7a0c2e}
+#home .format-icon{font-size:21px}
+@media(max-width:700px){#home.card{margin:10px;padding:22px 17px;border-radius:18px}#home .mode-grid{grid-template-columns:1fr}#home .hero-title{letter-spacing:-1px}#home .join-fields{grid-template-columns:1fr}#home .join-fields input:first-child{grid-column:auto}#home:before{width:220px;height:220px;right:-100px}}
+
+
+.question-editor{margin-top:18px;padding:16px 18px;border:1px solid #e4d1a7;border-radius:16px;background:#fffdf8}
+.question-editor>summary{cursor:pointer;list-style-position:inside;color:#7a0c2e;font-weight:900;letter-spacing:.4px}
+.question-editor .editor-hint{display:block;margin:7px 0 0 22px;color:#8b777b;font-size:12px;font-weight:500;letter-spacing:0}
+.question-editor .editor-copy{color:#716168;font-size:13px;line-height:1.55;margin:12px 0}
+#questionPackEditor{display:block;width:100%;min-height:280px;box-sizing:border-box;padding:14px;border:1px solid #d9c7a3;border-radius:12px;background:#fffaf0;color:#38212a;font:12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;resize:vertical;white-space:pre;tab-size:2}
+.question-editor .editor-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.question-editor .editor-actions .btn{margin:0}
+.question-pack-status{margin-top:10px;padding:9px 12px;border-radius:9px;background:#f6edd9;color:#6c4b42;font-size:13px}
+.format-help{margin-top:12px;border-top:1px solid #eee0c4;padding-top:10px}
+.format-help>summary{cursor:pointer;color:#7a0c2e;font-weight:800}
+.format-help pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;border-radius:10px;background:#f6edd9;color:#3b2730;font-size:12px}
+@media(max-width:700px){.question-editor{padding:13px}#questionPackEditor{min-height:220px;font-size:11px}}
+
+
+/* ===== MINI QUIZ BATTLE v15 · premium visual system ===== */
+:root{--m:#760d2e;--g:#e2b83f;--c:#fffaf0;--d:#24131a;--ok:#16804a;--no:#c62828;--blue:#2857a8;--line:#eadfc9;--muted:#81727a}
+*{box-sizing:border-box}
+body{font-family:'Manrope',sans-serif;background:#260914;background-image:radial-gradient(ellipse at 12% 8%,#8d173a 0,transparent 32%),radial-gradient(ellipse at 88% 88%,#745117 0,transparent 26%),linear-gradient(145deg,#200711,#3c0a20 55%,#1e0b15);color:var(--d);letter-spacing:-.01em}
+h1,h2,h3,.hero-title,.score,.code,.winner-name{font-family:'Space Grotesk','Manrope',sans-serif}
+.wrap{max-width:1320px;margin:auto;padding:clamp(12px,2.4vw,30px)}
+.card{background:#fffaf1;border:1px solid #f4df9c;border-radius:26px;padding:clamp(18px,3vw,36px);box-shadow:0 28px 90px #10020b70}
+.btn{font-family:'Manrope',sans-serif;letter-spacing:.045em;transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:0 9px 22px #4c0a2225}
+input,select{font:600 14px 'Manrope',sans-serif;color:#321e27;background:#fffdf9;border:1.5px solid #e4d9c7;border-radius:12px;padding:14px 15px;outline:none;transition:border-color .18s,box-shadow .18s}
+input:focus,select:focus{border-color:#b78c24;box-shadow:0 0 0 4px #e2b83f2a}
+.primary{background:linear-gradient(120deg,#7a0c2e,#57051f);color:white}
+.gold{background:linear-gradient(120deg,#f0cf67,#dcae2f);color:#2a111b}
+.ghost{background:#f0e9dd;color:#442332}
+.blue{background:#315ba0;color:white}
+.danger{background:#8d1730;color:white}
+#home.card{position:relative;isolation:isolate;overflow:hidden;max-width:1220px;margin:12px auto;padding:0 0 20px;background:#fffaf1;border:1px solid #e9c85f;border-radius:28px;box-shadow:0 30px 100px #08010688}
+#home:before{content:none}
+#home:after{content:none}
+.mq-nav{height:82px;padding:0 clamp(20px,4vw,52px);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eadfc9}
+.mq-brandmark{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:800;letter-spacing:1.4px;color:#401225;line-height:1.1}
+.mq-brandmark b{color:var(--m)}
+.mq-brandmark small{display:block;font-size:9px;letter-spacing:2px;color:#98818a;font-weight:800;margin-top:6px}
+.mq-mark{width:40px;height:40px;display:grid;place-items:center;background:var(--m);color:#f6d36a;border-radius:13px 13px 13px 4px;font:700 24px 'Space Grotesk';box-shadow:4px 4px 0 #e6c04f}
+.mq-nav-note{display:flex;align-items:center;gap:9px;font-size:10px;font-weight:900;letter-spacing:1.5px;color:#6f5963;background:#f5eddf;padding:10px 13px;border-radius:99px}
+.live-dot,.mode-foot-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#39a76a;box-shadow:0 0 0 4px #39a76a1c}
+.mq-hero{display:grid;grid-template-columns:1.08fr .92fr;align-items:center;gap:24px;min-height:390px;padding:38px clamp(24px,5vw,68px) 32px;background:linear-gradient(105deg,#fffaf1 0%,#fff8e8 54%,#f7edda 100%);position:relative}
+.mq-hero-copy{position:relative;z-index:2}
+.mq-eyebrow{display:flex;align-items:center;gap:9px;color:#8d6920;font-size:10px;font-weight:900;letter-spacing:2px}
+.mq-eyebrow span{display:grid;place-items:center;width:25px;height:25px;border-radius:8px;background:#f4e2a9;color:#790d30;font-size:16px}
+#home .hero-title{font-size:clamp(46px,6.5vw,82px);line-height:.91;letter-spacing:-.075em;margin:22px 0 20px;color:#27121c;font-weight:700}
+#home .hero-title span{color:var(--m);position:relative;display:inline-block}
+#home .hero-title span:after{content:"";position:absolute;left:2px;bottom:-8px;width:76%;height:5px;background:var(--g);border-radius:9px;transform:skewX(-24deg)}
+#home .hero-copy{font-size:clamp(14px,1.35vw,17px);line-height:1.8;max-width:470px;color:#75636b;margin:0}
+.mq-stats{display:flex;align-items:center;gap:15px;margin-top:30px}
+.mq-stats div{display:flex;flex-direction:column;gap:5px}
+.mq-stats strong{font:700 22px 'Space Grotesk';color:#790d30}
+.mq-stats span{font-size:8px;font-weight:900;letter-spacing:1.1px;color:#8c7b7e;white-space:nowrap}
+.mq-stats i{width:1px;height:34px;background:#e4d3b5}
+.mq-hero-art{height:320px;position:relative;display:flex;align-items:center;justify-content:center;isolation:isolate}
+.orbit{position:absolute;border:1px solid #d4ae4c66;border-radius:50%;transform:rotate(-22deg)}
+.orbit-one{width:290px;height:290px}
+.orbit-two{width:350px;height:220px;transform:rotate(35deg)}
+.art-card{position:absolute;border-radius:22px;box-shadow:0 24px 45px #4e122527}
+.card-back{width:155px;height:205px;right:9%;top:34px;transform:rotate(13deg);background:#e9c65b;color:#6f0c2b;padding:20px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid #f9e7a5}
+.card-back span{font-size:10px;font-weight:900;letter-spacing:2px}
+.card-back b{font:700 100px 'Space Grotesk';align-self:center;line-height:1}
+.card-front{width:205px;height:250px;left:14%;top:36px;transform:rotate(-7deg);background:linear-gradient(150deg,#7e1033,#4b071f);border:1px solid #e4bf4d;color:#fff8e7;padding:17px;box-shadow:0 20px 50px #5b092b55,5px 6px 0 #d9b341;display:flex;flex-direction:column;align-items:center}
+.art-card-top{width:100%;display:flex;justify-content:space-between;font-size:8px;letter-spacing:1.5px;font-weight:900;color:#f3d36f}
+.art-trophy{font-size:80px;line-height:1.2;color:#f2cd5e;text-shadow:3px 5px 0 #8f5d19;margin:12px 0 3px}
+.art-score{font:700 32px 'Space Grotesk';color:#fff3bf}
+.art-score small{font-size:12px;color:#f2ce63;letter-spacing:2px}
+.art-card-bottom{display:flex;gap:5px;margin-top:auto;width:100%}
+.art-card-bottom span{height:5px;flex:1;border-radius:9px;background:#f3d36f}
+.art-card-bottom span:nth-child(2){opacity:.65}.art-card-bottom span:nth-child(3){opacity:.4}.art-card-bottom span:nth-child(4){opacity:.2}
+.art-spark{position:absolute;color:#c49322;font-size:32px}
+.spark-a{top:25px;left:13%}.spark-b{bottom:22px;right:13%;font-size:44px;color:#870e34}
+.art-tag{position:absolute;padding:10px 13px;border-radius:10px;background:#fffdf7;border:1px solid #e7d8b6;box-shadow:0 8px 22px #4d1b2012;font-size:9px;font-weight:900;letter-spacing:1px;color:#68102b;white-space:nowrap}
+.tag-top{right:1%;top:45px;transform:rotate(5deg)}.tag-bottom{left:0;bottom:30px;transform:rotate(-4deg)}
+.mq-mode-heading{display:flex;align-items:center;gap:15px;padding:28px clamp(24px,5vw,68px) 16px;color:#6e142f;font-size:10px;font-weight:900;letter-spacing:2px}
+.mq-mode-heading div{height:1px;flex:1;background:#e8dbc5}
+.mq-mode-heading small{color:#a0908d;font-size:8px;letter-spacing:1.2px;white-space:nowrap}
+#home .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 clamp(24px,5vw,68px) 28px;margin:0}
+#home .mode-panel{position:relative;min-width:0;border:1px solid #e8dcc7;border-radius:19px;padding:22px 24px 18px;background:#fffdf8;box-shadow:0 8px 20px #4b16200a}
+#home .mode-panel.host{background:linear-gradient(145deg,#fff2cc,#fffaf0 70%);border-color:#e8cf83}
+#home .mode-topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+#home .mode-icon{display:grid;place-items:center;width:42px;height:42px;margin:0;border-radius:13px;background:#760d2e;color:#f6d66e;font:700 26px 'Space Grotesk'}
+#home .join-panel .mode-icon{background:#e5b83c;color:#4a1024}
+#home .mode-number{font-size:9px;font-weight:900;letter-spacing:1.6px;color:#9b8589}
+#home .mode-panel h2{font:700 clamp(22px,2.5vw,30px) 'Space Grotesk';letter-spacing:-1.1px;color:#32121f;margin:0 0 8px}
+#home .mode-panel p{font-size:12px;line-height:1.7;color:#817178;margin:0 0 16px;max-width:410px}
+#home .mode-panel .btn{width:100%;display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:15px 17px;border-radius:11px;font-size:10px;letter-spacing:1px}
+#home .mode-panel .btn span{font-size:17px}
+#home .mode-foot{display:flex;align-items:center;gap:8px;margin-top:17px;font-size:8px;font-weight:900;letter-spacing:1.4px;color:#98868a}
+#home .gold-dot{background:#d4a72c;box-shadow:0 0 0 4px #d4a72c1e}
+#home .join-fields{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+#home .join-fields input:first-child{grid-column:1/-1}
+#home .join-fields input,#home .join-fields select{margin:0 0 9px;font-size:12px;padding:12px}
+#home .format-strip{display:flex;gap:12px;align-items:center;margin:0 clamp(24px,5vw,68px) 20px;padding:14px 16px;border-radius:12px;background:#f5eddf;color:#79656b;font-size:11px;line-height:1.6}
+#home .format-strip strong{color:#79102f;letter-spacing:1px}
+#home .format-icon{font-size:20px}
+#home .question-editor{margin:0 clamp(24px,5vw,68px);padding:0;border:1px solid #e8dcc7;border-radius:15px;background:#fffdf8;overflow:hidden}
+#home .question-editor>summary{display:flex;align-items:center;gap:12px;list-style:none;padding:16px;cursor:pointer;color:#4b1829}
+#home .question-editor>summary::-webkit-details-marker{display:none}
+#home .question-editor>summary b{display:block;font-size:11px;letter-spacing:1.1px}
+#home .question-editor>summary small{display:block;font-size:11px;color:#8b7a80;margin-top:4px;font-weight:500;letter-spacing:0}
+#home .editor-pencil{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#f5e8c7;color:#760d2e;font-size:21px}
+#home .editor-chevron{margin-left:auto;font-size:22px;color:#8a1839}
+#home .question-editor[open] .editor-chevron{transform:rotate(45deg)}
+#home .editor-inner{padding:0 16px 16px}
+#home .question-editor .editor-copy{font-size:12px;line-height:1.7;color:#827178}
+#home #questionPackEditor{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;border:1px solid #e3d5bd;background:#fffaf0;border-radius:10px}
+#home .question-pack-status{font-size:12px;border-radius:9px}
+#home .mq-footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:21px clamp(24px,5vw,68px) 0;color:#a18e91;font-size:8px;font-weight:900;letter-spacing:1.3px}
+#home .mq-footer span:first-child{color:#7b1734}
+#home .mq-footer b{color:#d1a92f}
+.top .brand{font-size:10px;letter-spacing:2.4px}
+.top h1{font-size:clamp(28px,4vw,42px);letter-spacing:-1.5px;margin:10px 0;color:#2b111c}
+.scores .team{background:linear-gradient(145deg,#fff7e4,#f3e6cb);border:1px solid #e3d1a6;border-radius:20px;padding:20px}
+.score{font-size:clamp(42px,6vw,66px);color:#790d30}
+.q{font-family:'Space Grotesk',sans-serif;font-size:clamp(23px,3vw,36px);letter-spacing:-.8px;line-height:1.28}
+.opts .opt{font-family:'Manrope',sans-serif;font-size:14px;line-height:1.5;border:1.5px solid #e2d8ca;border-radius:14px;transition:all .16s ease}
+.opts .opt:hover{border-color:#d3a832;transform:translateY(-1px)}
+.pill{font-size:10px;letter-spacing:.7px;background:#f0e6d7;color:#6c1830}
+.answer-review summary{font-size:12px;letter-spacing:.2px}
+@media(max-width:780px){
+ .mq-hero{grid-template-columns:1fr;padding-top:34px;gap:8px}
+ .mq-hero-art{height:260px;max-width:430px;width:100%;margin:0 auto}
+ .orbit-one{width:240px;height:240px}.orbit-two{width:290px;height:185px}
+ .card-front{left:20%;width:175px;height:218px}.card-back{right:15%;width:130px;height:175px}
+ .art-trophy{font-size:65px}.art-score{font-size:26px}
+ .mq-mode-heading small{display:none}
+}
+@media(max-width:600px){
+ .wrap{padding:8px}
+ #home.card{border-radius:18px}
+ .mq-nav{height:70px;padding:0 17px}
+ .mq-brandmark{font-size:11px;letter-spacing:.8px;gap:9px}
+ .mq-brandmark small{font-size:7px;letter-spacing:1.3px}
+ .mq-mark{width:34px;height:34px;font-size:20px}
+ .mq-nav-note{font-size:8px;padding:8px}
+ .mq-hero{padding:28px 21px 15px}
+ #home .hero-title{font-size:clamp(43px,13vw,64px)}
+ .mq-stats{gap:9px;margin-top:24px}
+ .mq-stats strong{font-size:18px}.mq-stats span{font-size:7px;letter-spacing:.4px}
+ .mq-hero-art{height:230px}
+ .card-front{left:19%;top:22px;width:150px;height:190px;padding:13px}
+ .card-back{right:12%;top:25px;width:110px;height:155px;padding:14px}
+ .card-back b{font-size:78px}
+ .art-trophy{font-size:52px;margin:8px 0}
+ .art-score{font-size:22px}
+ .art-tag{font-size:7px;padding:8px}.tag-top{right:0}.tag-bottom{left:0;bottom:18px}
+ .mq-mode-heading{padding:23px 21px 13px;font-size:9px}
+ #home .mode-grid{grid-template-columns:1fr;padding:0 17px 22px;gap:12px}
+ #home .mode-panel{padding:19px}
+ #home .format-strip,#home .question-editor{margin-left:17px;margin-right:17px}
+ #home .mq-footer{padding:18px 20px 0}
+ .scores,.bracket{grid-template-columns:1fr}
+ .vs{display:none}
+ .opts{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+
+/* ===== MINI QUIZ BATTLE v16 · CINEMATIC ARENA SKIN ===== */
+:root{--m:#760b2b;--g:#e6bd4d;--c:#fff9ed;--d:#28131d;--line:#e9d6ad}
+body{
+ background-color:#210610;
+ background-image:
+  radial-gradient(ellipse at 50% -12%,#9a1e43 0%,transparent 38%),
+  radial-gradient(ellipse at -5% 70%,#6b1230 0%,transparent 33%),
+  radial-gradient(ellipse at 105% 90%,#a57a1c55 0%,transparent 25%),
+  repeating-linear-gradient(135deg,#ffffff03 0px,#ffffff03 1px,transparent 1px,transparent 9px),
+  linear-gradient(145deg,#1d0610 0%,#4b0923 48%,#1d0711 100%);
+}
+.wrap{max-width:1440px;padding:clamp(10px,2vw,28px)}
+.card{position:relative;isolation:isolate;overflow:hidden;border:1px solid #e7c65e;background:linear-gradient(145deg,#fffaf0 0%,#fff6e5 100%);box-shadow:0 28px 90px #0901078c,0 0 0 5px #d5a82d0d}
+.card:before{content:"";position:absolute;z-index:-1;pointer-events:none;top:-170px;right:-155px;width:390px;height:390px;border:1px solid #c79b3150;border-radius:50%;box-shadow:0 0 0 18px #c79b310b,0 0 0 42px #c79b3109,0 0 0 68px #c79b3106}
+.card:after{content:"✦";position:absolute;z-index:-1;pointer-events:none;bottom:20px;left:25px;font-size:70px;color:#d4a72c12;transform:rotate(-14deg)}
+/* Home becomes a poster-like game launch screen */
+#home.card{border:2px solid #d6ad43;box-shadow:0 35px 110px #050006a8,0 0 0 7px #e8c64b12}
+#home .mq-nav{position:relative;background:linear-gradient(90deg,#fffaf0,#fff6e6);border-bottom:1px solid #e5d1a2}
+#home .mq-brandmark{font-family:'Space Grotesk',sans-serif;letter-spacing:1.6px}
+#home .mq-mark{border:1px solid #f5d778;box-shadow:3px 4px 0 #c99d2e,0 0 0 4px #7a0c2e0a;border-radius:12px 12px 12px 3px}
+#home .mq-hero{min-height:455px;overflow:hidden;isolation:isolate;background:
+ radial-gradient(ellipse at 83% 52%,#8c1237 0%,#5b0826 38%,#360719 72%),
+ linear-gradient(120deg,#5a0825,#270611);color:#fff8e8}
+#home .mq-hero:before{content:"";position:absolute;z-index:-1;inset:0;background:
+  radial-gradient(circle at 80% 50%,transparent 0 155px,#e7c45b19 156px 157px,transparent 158px),
+  radial-gradient(circle at 80% 50%,transparent 0 205px,#e7c45b10 206px 207px,transparent 208px),
+  repeating-linear-gradient(135deg,transparent 0 14px,#fff 15px,transparent 16px 29px);opacity:.16}
+#home .mq-hero:after{content:"";position:absolute;z-index:-1;left:-80px;bottom:-180px;width:370px;height:370px;border:2px solid #e3bd4c;border-radius:50%;box-shadow:0 0 0 16px #e3bd4c0c,0 0 0 38px #e3bd4c0a}
+#home .mq-hero-copy{padding:14px 0}
+#home .mq-eyebrow{color:#f2d77b}
+#home .mq-eyebrow span{background:linear-gradient(135deg,#f5d66f,#c48e20);color:#5c0a25;box-shadow:0 4px 12px #10020b55}
+#home .hero-title{color:#fff5dc!important;text-shadow:0 3px 0 #3d071b;letter-spacing:-.08em!important}
+#home .hero-title span{color:#f3cf61!important;text-shadow:0 2px 0 #5b0a25}
+#home .hero-title span:after{background:#fff1b7;height:4px;box-shadow:0 2px 0 #b77c22}
+#home .hero-copy{color:#f8e7df;max-width:500px}
+#home .mq-stats strong{color:#f3d36f}
+#home .mq-stats span{color:#e8cfd6}
+#home .mq-stats i{background:#f1d47b55}
+#home .mq-hero-art{height:365px;filter:drop-shadow(0 18px 24px #14020b66)}
+#home .orbit{border-color:#e5bd4f75;box-shadow:0 0 0 9px #d8b14c08}
+#home .orbit-one{width:315px;height:315px}
+#home .orbit-two{width:390px;height:238px;border-style:dashed}
+#home .card-front{width:220px;height:276px;left:13%;top:35px;border:2px solid #f4d36c;border-radius:18px;background:linear-gradient(145deg,#8f153d,#4a071f 76%);box-shadow:0 22px 35px #16020d77,5px 6px 0 #c18f24,0 0 0 5px #e5bd4b18;transform:rotate(-8deg)}
+#home .card-front:before{content:"";position:absolute;inset:8px;border:1px solid #f5d77365;border-radius:12px;pointer-events:none}
+#home .art-trophy{font-size:94px;color:#f7d56c;text-shadow:0 3px 0 #b57b20,0 9px 18px #14020c}
+#home .art-score{color:#fff4c8;font-size:35px}
+#home .art-score small{color:#f1cf60}
+#home .art-card-bottom span{background:linear-gradient(90deg,#fff0a4,#dba82f)}
+#home .card-back{background:linear-gradient(145deg,#f7d976,#b67e1b);border:2px solid #ffed9d;box-shadow:0 16px 32px #16020d55,4px 5px 0 #6b0b2d;transform:rotate(13deg)}
+#home .art-tag{background:#fff8e8;border:1px solid #f0d16c;color:#6b0a2b;box-shadow:0 7px 0 #d6ad4333,0 15px 22px #15020a3a}
+#home .spark-a,#home .spark-b{color:#f6d875;text-shadow:0 0 15px #efc34b77}
+#home .tag-top{right:-1%;top:30px}
+#home .tag-bottom{left:-1%;bottom:18px}
+#home .mq-mode-heading{color:#6c0b2a}
+#home .mq-mode-heading div{background:linear-gradient(90deg,#e3c56e,transparent)}
+#home .mode-panel{transition:transform .2s,box-shadow .2s}
+#home .mode-panel:hover{transform:translateY(-3px);box-shadow:0 14px 30px #4b16201b}
+#home .mode-panel.host{background:linear-gradient(145deg,#fff0bf,#fffaf0 72%);border:1px solid #d9b64a;box-shadow:inset 0 0 0 3px #f3df9b55}
+#home .mode-icon{box-shadow:0 4px 0 #4b071e,0 8px 18px #5c0a2522}
+#home .join-panel .mode-icon{box-shadow:0 4px 0 #bc8a21}
+#home .mode-panel .btn{box-shadow:0 5px 0 #3d071c,0 9px 16px #4b071e22}
+#home .join-panel .btn{box-shadow:0 5px 0 #b98b26,0 9px 16px #9a721a1c}
+#home .format-strip{border:1px solid #ead7ac;background:linear-gradient(100deg,#f7ecd3,#fff9ed)}
+#home .question-editor{box-shadow:0 8px 24px #4b16200a}
+#home .mq-footer{border-top:1px solid #f0e3cb;margin-top:18px}
+/* Game screens use a dark jewel-like top banner and ivory gameplay panels */
+.game-screen{border:2px solid #d7b246;border-radius:24px}
+.game-screen .top{position:relative;margin:-1px -1px 20px;padding:24px clamp(18px,3vw,34px);border-radius:17px 17px 8px 8px;background:
+ radial-gradient(circle at 90% 20%,#a72a4f 0%,transparent 28%),
+ linear-gradient(115deg,#310619,#760b2b 55%,#3b071b);color:#fff5d8;box-shadow:inset 0 -2px 0 #e1ba4b}
+.game-screen .top .brand{color:#f2d16a;letter-spacing:2.8px}
+.game-screen .top h1{color:#fff7e7;font-size:clamp(26px,4vw,42px);letter-spacing:-1.8px;margin:8px 0 0;text-shadow:0 2px 0 #360719}
+.game-screen .top .code{color:#ffe18a;text-shadow:0 3px 0 #4a061d;font-size:clamp(32px,4vw,48px)}
+.game-screen .top .center{color:#f3d77d;font-size:11px;font-weight:900;letter-spacing:1.5px}
+.arena-ornament{position:absolute;z-index:-1;pointer-events:none;color:#c79b3120;font-size:170px;line-height:1;top:90px}
+.arena-ornament-left{left:-28px;transform:rotate(-18deg)}
+.arena-ornament-right{right:-22px;top:240px;font-size:210px;transform:rotate(12deg)}
+.game-screen .bracket{gap:12px;margin:20px 0}
+.game-screen .bracket .box{position:relative;overflow:hidden;border:1px solid #e5d2a3;background:linear-gradient(145deg,#fffaf0,#f3e4c5);box-shadow:inset 0 0 0 3px #fffdf75c}
+.game-screen .bracket .box:before{content:"✦";position:absolute;right:8px;top:4px;color:#d4a72c55;font-size:22px}
+.game-screen .bracket .box b{letter-spacing:1px;font-size:11px}
+.game-screen .scores .team{border:2px solid #e3c777;background:linear-gradient(145deg,#fff9e8,#f1e0bb);box-shadow:0 7px 0 #e6d3a6,0 12px 20px #5b17200c}
+.game-screen .scores .team:first-child{border-bottom:4px solid #8b1537}
+.game-screen .scores .team:last-child{border-bottom:4px solid #d4a72c}
+.game-screen .scores .team b{font-size:13px;letter-spacing:1.4px;color:#6f0c2b}
+.game-screen .scores .vs{font-family:'Space Grotesk';color:#7a0c2e;font-size:24px}
+.game-screen .pill{border:1px solid #e3cf9f;background:#f4e8d0;color:#71102d}
+.game-screen #hostPlayers,.game-screen #playerNotice{border:1px solid #e9d8b6;background:linear-gradient(100deg,#fff7e6,#f5e8d0);color:#73545d}
+.game-screen .q{position:relative;padding:22px 24px;border:1px solid #e7d6b7;border-radius:17px;background:linear-gradient(145deg,#fffdf7,#fff5e3);box-shadow:0 12px 25px #4a0b1e0b;color:#2d1420}
+.game-screen .q:before{content:"THE CHALLENGE";display:block;margin-bottom:10px;color:#9b7827;font:900 9px 'Manrope';letter-spacing:2px}
+.game-screen .timer{font:700 clamp(44px,6vw,66px) 'Space Grotesk';color:#780b2c;text-shadow:0 3px 0 #ead6a4;margin:10px auto}
+.game-screen #hostStatus,.game-screen #playerMessage{font-size:12px;font-weight:800;letter-spacing:.4px;color:#856c72}
+.game-screen .opts .opt{border:1.5px solid #e5d8c3;background:linear-gradient(145deg,#fffdf8,#fbf3e5);box-shadow:0 4px 0 #e9ddc9;font-weight:800}
+.game-screen .opts .opt.sel{border-color:#8c1538;background:#f6e0e7;color:#670a29;box-shadow:0 4px 0 #d7aab9}
+.game-screen .opts .opt.correct{border-color:#278a55!important;background:#e0f5e7!important;color:#145c38;box-shadow:0 4px 0 #b8dfc5!important}
+.game-screen .row .btn{min-height:46px;box-shadow:0 4px 0 #0000000c;letter-spacing:.5px}
+.game-screen .row .primary{box-shadow:0 4px 0 #41051b}
+.game-screen .row .gold{box-shadow:0 4px 0 #b68b26}
+.game-screen .round-result{position:relative;overflow:hidden;border:2px solid #d7ae37;background:linear-gradient(145deg,#fff2c8,#f0dcae);box-shadow:0 0 0 5px #d6ad431c,0 12px 30px #4a061d12}
+.game-screen .round-result .result-title{color:#790b2e;font:700 clamp(20px,3vw,30px) 'Space Grotesk';letter-spacing:2px}
+.game-screen .round-result .winner-banner{border:3px solid #f4d36c;background:
+ radial-gradient(circle at 50% -10%,#9b2448 0%,transparent 45%),
+ linear-gradient(135deg,#590720,#800c31 50%,#330516);box-shadow:0 0 0 5px #d4a72c25,0 16px 36px #4b061f3b}
+.game-screen .round-result .winner-name{text-shadow:0 2px 0 #3a0618,0 8px 18px #17010a77;color:#fff0b2}
+.game-screen .round-result .winner-kicker{color:#ffe17b}
+.game-screen .answer-reveal{border:3px solid #e8c34d;background:
+ radial-gradient(circle at 50% 0%,#8e1b3e 0%,transparent 65%),
+ linear-gradient(145deg,#57071f,#340514);box-shadow:0 0 0 5px #d4a72c1c,0 15px 30px #4b061f28}
+.game-screen .answer-reveal .reveal-choice{font-size:clamp(25px,3.2vw,44px);text-shadow:none;overflow-wrap:anywhere}
+.game-screen .answer-review{position:relative;z-index:1}
+.game-screen .answer-review summary{border:1px solid #e4d1a7;background:#f4e7ce}
+.game-screen .table th{color:#75102d;font-size:12px;letter-spacing:.4px}
+.game-screen .table td{font-size:13px}
+.player-screen .top{padding-bottom:28px}
+.player-screen #playerNotice{font-weight:700}
+.player-screen #playerQuestion{margin-top:24px}
+.player-screen #playerOptions .opt{min-height:68px;font-size:15px;padding:18px}
+.player-screen #playerOptions .opt:before{font-weight:900;color:#8a1336}
+.final-screen{min-height:470px;padding:clamp(30px,6vw,70px);background:
+ radial-gradient(ellipse at 50% 0%,#fff4cf 0%,transparent 42%),
+ linear-gradient(145deg,#fffaf0,#f3e3c1);border:3px solid #d9b342}
+.final-screen .final-crown{font-size:clamp(72px,12vw,130px);line-height:1;color:#d7ad39;text-shadow:0 4px 0 #8e651d,0 12px 24px #5c0b2528;margin-bottom:12px}
+.final-screen .brand{color:#8b6420;letter-spacing:4px}
+.final-screen h1{font-size:clamp(34px,6vw,64px);color:#5c0826;letter-spacing:-2px}
+.final-screen #finalScore{color:#8a1536;font:700 clamp(20px,3vw,30px) 'Space Grotesk'}
+.final-screen .winner{display:inline-block;max-width:100%;margin:18px auto 28px;padding:24px clamp(18px,4vw,48px);border:3px solid #e7c456;border-radius:20px;background:linear-gradient(145deg,#6d0928,#340516);color:#fff0b0;font:700 clamp(25px,5vw,50px) 'Space Grotesk';box-shadow:0 0 0 6px #d6ad4324,0 20px 40px #4b061f25;overflow-wrap:anywhere}
+@media(max-width:780px){
+ #home .mq-hero{min-height:0}
+ #home .mq-hero-art{height:300px}
+ #home .card-front{left:19%}
+ #home .card-back{right:13%}
+ .game-screen .top{gap:14px}
+ .game-screen .bracket{grid-template-columns:1fr}
+ .game-screen .bracket .box{padding:13px}
+ .game-screen .row{display:grid;grid-template-columns:1fr 1fr}
+ .game-screen .row .btn{width:100%;font-size:11px;padding:12px 8px}
+}
+@media(max-width:520px){
+ .game-screen .top{align-items:flex-start}
+ .game-screen .top .center{font-size:9px}
+ .game-screen .scores{gap:8px}
+ .game-screen .scores .team{padding:12px 8px}
+ .game-screen .q{padding:17px;font-size:22px}
+ .game-screen .row{grid-template-columns:1fr}
+ .arena-ornament{font-size:110px}
+}
+
+</style>
+</head>
+<body><div class="wrap">
+<section id="home" class="card">
+  <nav class="mq-nav">
+    <div class="mq-brandmark"><span class="mq-mark">M</span><span>MINI QUIZ <b>BATTLE</b><small>THE LIVE LEARNING ARENA</small></span></div>
+    <div class="mq-nav-note"><span class="live-dot"></span> READY TO PLAY</div>
+  </nav>
+
+  <div class="mq-hero">
+    <div class="mq-hero-copy">
+      <div class="mq-eyebrow"><span>✦</span> LEARN • COMPETE • CELEBRATE</div>
+      <h1 class="hero-title">MAKE EVERY<br><span>ANSWER</span><br>COUNT.</h1>
+      <p class="hero-copy">Turn any lesson into a live team battle. Think fast, trust your knowledge, and play for the win.</p>
+      <div class="mq-stats">
+        <div><strong>01</strong><span>CREATE A BATTLE</span></div>
+        <i></i>
+        <div><strong>02</strong><span>JOIN YOUR TEAM</span></div>
+        <i></i>
+        <div><strong>03</strong><span>CLAIM THE WIN</span></div>
+      </div>
+    </div>
+    <div class="mq-hero-art" aria-hidden="true">
+      <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+      <div class="art-spark spark-a">✦</div><div class="art-spark spark-b">✧</div>
+      <div class="art-card card-back"><span>QUIZ</span><b>?</b></div>
+      <div class="art-card card-front"><div class="art-card-top"><span>THE BATTLE</span><span>✦</span></div><div class="art-trophy">♛</div><div class="art-score">+20 <small>XP</small></div><div class="art-card-bottom"><span></span><span></span><span></span><span></span></div></div>
+      <div class="art-tag tag-top">⚡ THINK FAST</div><div class="art-tag tag-bottom">🏆 WIN TOGETHER</div>
+    </div>
+  </div>
+
+  <div class="mq-mode-heading"><span>CHOOSE YOUR SIDE</span><div></div><small>ONE ARENA. TWO WAYS TO PLAY.</small></div>
+  <div class="mode-grid">
+    <div class="mode-panel host">
+      <div class="mode-topline"><div class="mode-icon">↗</div><span class="mode-number">01 / HOST</span></div>
+      <h2>Host a battle.</h2>
+      <p>Create a live game, share the code on your screen, and control the action question by question.</p>
+      <button class="btn primary" onclick="createGame()">CREATE NEW BATTLE <span>↗</span></button>
+      <div class="mode-foot"><span class="mode-foot-dot"></span> FOR TEACHERS & HOSTS</div>
+    </div>
+    <div class="mode-panel join-panel">
+      <div class="mode-topline"><div class="mode-icon">⌁</div><span class="mode-number">02 / PLAYER</span></div>
+      <h2>Join the battle.</h2>
+      <p>Enter your game code, choose a team, and get ready to compete with your classmates.</p>
+      <div class="join-fields">
+        <input id="joinCode" placeholder="6-digit game code" aria-label="Game Code" inputmode="numeric" maxlength="6">
+        <select id="joinTeam" aria-label="Choose Team"><option value="A">TEAM A</option><option value="B">TEAM B</option><option value="C">TEAM C</option><option value="D">TEAM D</option></select>
+        <input id="joinName" placeholder="Your player name" aria-label="Player Name" maxlength="40">
+      </div>
+      <button class="btn gold" onclick="joinGame()">JOIN THE BATTLE <span>→</span></button>
+      <div class="mode-foot"><span class="mode-foot-dot gold-dot"></span> FOR PLAYERS & TEAMS</div>
+    </div>
+  </div>
+
+  <div id="configNotice" class="notice hidden" style="margin-top:16px"></div>
+
+  <details class="question-editor" id="questionEditor">
+    <summary><span class="editor-pencil">✎</span><span><b>QUESTION PACK STUDIO</b><small>Edit your questions before starting a new battle</small></span><span class="editor-chevron">＋</span></summary>
+    <div class="editor-inner">
+      <p class="editor-copy">Customize the quiz pack below. Changes are saved in this browser and copied to Firebase when a new battle is created. Keep 21 questions: 5 for Round 1, 5 for Round 2, 10 for Grand Final, and 1 for Sudden Death.</p>
+      <textarea id="questionPackEditor" spellcheck="false" aria-label="Question pack JSON"></textarea>
+      <div class="editor-actions">
+        <button class="btn gold" type="button" id="saveQuestionPackBtn">SAVE QUESTION PACK</button>
+        <button class="btn ghost" type="button" id="resetQuestionPackBtn">RESTORE DEMO QUESTIONS</button>
+      </div>
+      <div id="questionPackStatus" class="question-pack-status" role="status">Demo question pack loaded.</div>
+      <details class="format-help"><summary>Question format guide</summary>
+        <pre>[
+  "Question text",
+  ["Option A", "Option B", "Option C", "Option D"],
+  0,
+  "Explanation shown after reveal"
+]</pre>
+        <p class="editor-copy">Correct answer index: 0 = A, 1 = B, 2 = C, 3 = D. Each question must have four options and the pack must contain exactly 21 questions.</p>
+      </details>
+    </div>
+  </details>
+
+  <footer class="mq-footer"><span>MINI QUIZ BATTLE <b>©</b></span><span>BUILT FOR THE JOY OF LEARNING</span><span>MAROON / GOLD / IVORY</span></footer>
+</section>
+
+<section id="host" class="card hidden game-screen host-screen">
+<div class="arena-ornament arena-ornament-left" aria-hidden="true">✦</div><div class="arena-ornament arena-ornament-right" aria-hidden="true">♛</div>
+<div class="top"><div><div class="brand">HOST ARENA</div><h1>MINI QUIZ BATTLE</h1></div><div class="center">GAME CODE<div id="gameCode" class="code"></div></div></div>
+<div class="bracket"><div class="box"><b>ROUND 1</b><span id="brA">TEAM A</span> <strong>VS</strong> <span id="brB">TEAM B</span></div><div class="box"><b>ROUND 2</b><span id="brC">TEAM C</span> <strong>VS</strong> <span id="brD">TEAM D</span></div><div class="box"><b>GRAND FINAL</b><span id="brF1">Winner R1</span> <strong>VS</strong> <span id="brF2">Winner R2</span></div></div>
+<div class="scores"><div class="team"><b id="leftTeamName">TEAM A</b><div id="scoreLeft" class="score">0</div></div><div class="vs">VS</div><div class="team"><b id="rightTeamName">TEAM B</b><div id="scoreRight" class="score">0</div></div></div>
+<div class="center"><span id="round" class="pill">ROUND 1 — QUALIFIER</span><span id="questionNo" class="pill">QUESTION 1 / 5</span></div>
+<div id="hostPlayers" class="notice">Waiting for players...</div><div id="hostQuestion" class="q">Ready to enter the arena? Press START QUESTION to begin.</div><div id="hostOptions" class="opts"></div><div id="hostTimer" class="timer">20</div><div id="hostStatus" class="center">Waiting...</div><div id="hostExplanation" class="explain hidden"></div><div id="roundResult" class="round-result hidden"></div>
+<div class="row" style="margin-top:18px"><button type="button" id="startQuestionBtn" class="btn primary">START QUESTION</button><button type="button" id="revealAnswerBtn" class="btn gold">SHOW ANSWER</button><button type="button" id="nextQuestionBtn" class="btn ghost">NEXT QUESTION</button><button type="button" id="nextRoundBtn" class="btn blue">NEXT ROUND</button><button type="button" id="resetGameBtn" class="btn danger">RESET GAME</button></div>
+<details id="answerReview" class="answer-review"><summary>🔎 Lihat jawaban dan hasil semua pemain (scroll ke bawah)</summary><p class="mini">Bagian ini untuk evaluasi setelah jawaban benar diumumkan.</p><div style="overflow-x:auto"><table class="table"><thead><tr><th>Team</th><th>Player</th><th>Answer</th><th>Time</th><th>Status</th></tr></thead><tbody id="answerTable"></tbody></table></div></details>
+</section>
+
+<section id="player" class="card hidden game-screen player-screen">
+<div class="arena-ornament arena-ornament-left" aria-hidden="true">✦</div><div class="arena-ornament arena-ornament-right" aria-hidden="true">♛</div>
+<div class="top"><div><div class="brand">PLAYER ARENA</div><h1>MINI QUIZ BATTLE</h1></div><div><span id="playerTeam" class="pill"></span><span id="playerStatus" class="pill">CONNECTED</span></div></div>
+<div id="playerNotice" class="notice">You're in the arena. Wait for the host to launch the next challenge.</div><div id="playerTimer" class="timer">20</div><div id="playerQuestion" class="q">Waiting for Host...</div><div id="playerOptions" class="opts"></div><div id="playerMessage" class="center">Waiting...</div>
+</section>
+
+<section id="result" class="card center game-screen final-screen"><div class="final-crown" aria-hidden="true">♛</div><div class="brand">FINAL RESULT</div><h1>🏆 MINI QUIZ BATTLE</h1><h2 id="finalScore"></h2><div id="winner" class="winner"></div><button class="btn primary" onclick="location.reload()">NEW BATTLE</button></section>
+</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import {getAuth,signInAnonymously,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import {getDatabase,ref,set,get,update,onValue,remove,serverTimestamp,runTransaction} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+/* Firebase config: replace ONLY the values below with the config from Firebase Console. */
+const firebaseConfig={
+ apiKey:"AIzaSyBPVMH1ODMZ2qwkK-46MLDfjmCCuodWt9A",
+ authDomain:"root-sanctuary-500003-r6.firebaseapp.com",
+ databaseURL:"https://root-sanctuary-500003-r6-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId:"root-sanctuary-500003-r6",
+ storageBucket:"root-sanctuary-500003-r6.firebasestorage.app",
+ messagingSenderId:"681974843483",
+ appId:"1:681974843483:web:e9c826610c1c81437c577e",
+ measurementId:"G-P9LBMFQTMK"
+};
+
+let QUESTIONS=[
+["Pengguna membayar biaya secara rutin untuk menggunakan sebuah layanan digital. Model pendapatannya adalah...",["Advertising","Subscription","Commission","Marketplace"],1,"Subscription menghasilkan pendapatan dari pembayaran berulang."],
+["Pengguna dapat memakai layanan gratis, tetapi fitur premium harus dibayar. Model ini disebut...",["Freemium","Commission","Advertising","Marketplace"],0,"Freemium menggabungkan akses dasar gratis dengan fitur premium berbayar."],
+["Platform mendapatkan pendapatan dengan menampilkan iklan kepada penggunanya. Model ini adalah...",["Subscription","Freemium","Advertising","Commission"],2,"Advertising menghasilkan pendapatan dari pengiklan."],
+["Platform memperoleh bagian dari nilai transaksi yang terjadi melalui platform. Model ini adalah...",["Advertising","Commission","Subscription","Freemium"],1,"Commission atau transaction fee mengambil bagian dari transaksi."],
+["Platform mempertemukan penjual dan pembeli dalam satu sistem digital. Ini merupakan...",["Marketplace","Subscription","Advertising","Freemium"],0,"Marketplace mempertemukan penjual dan pembeli dalam satu platform."],
+["Sebuah aplikasi memiliki versi gratis dan menawarkan paket Pro dengan fitur tambahan. Model yang paling tepat adalah...",["Commission","Freemium","Advertising","Marketplace"],1,"Ada akses dasar gratis dan opsi premium berbayar."],
+["Sebuah platform memperoleh uang ketika perusahaan membayar agar produknya tampil kepada pengguna. Modelnya adalah...",["Subscription","Advertising","Commission","Freemium"],1,"Pengiklan membayar untuk mendapatkan perhatian audiens."],
+["Sebuah layanan meminta pengguna membayar Rp50.000 setiap bulan agar tetap dapat menggunakan fitur utamanya. Modelnya adalah...",["Marketplace","Commission","Subscription","Advertising"],2,"Pembayaran rutin merupakan ciri subscription."],
+["Sebuah platform menghubungkan pembeli dengan penjual dan mengambil biaya dari setiap transaksi. Model pendapatannya adalah...",["Advertising","Freemium","Commission","Subscription"],2,"Platform mendapatkan bagian dari transaksi yang terjadi."],
+["Sebuah website menjadi tempat banyak toko menawarkan produk kepada konsumen. Fungsi utamanya adalah mempertemukan...",["Pengiklan dan desainer","Penjual dan pembeli","Dosen dan mahasiswa","Produsen dan karyawan"],1,"Ciri utama marketplace adalah mempertemukan penjual dan pembeli."],
+["Sebuah aplikasi musik menyediakan akses gratis dengan iklan dan paket berbayar tanpa iklan. Model yang paling tepat adalah...",["Marketplace","Freemium","Commission","Transaction only"],1,"Ada akses gratis dan layanan premium berbayar, dengan iklan sebagai sumber tambahan."],
+["Sebuah platform memiliki banyak pengguna gratis. Banyak brand ingin menjangkau pengguna tersebut. Model pendapatan yang paling masuk akal adalah...",["Advertising","Marketplace","Subscription only","Commission"],0,"Basis pengguna menjadi nilai bagi pengiklan."],
+["Sebuah platform tidak memiliki stok barang sendiri. Platform mempertemukan banyak penjual dengan pembeli dan mengambil persentase transaksi. Modelnya adalah...",["Freemium","Subscription","Marketplace + Commission","Advertising"],2,"Platform berfungsi sebagai marketplace dan memperoleh pendapatan dari commission."],
+["Sebuah aplikasi belajar memberi materi dasar gratis. Pengguna membayar kelas lanjutan, sertifikat, dan fitur premium. Mengapa freemium cocok?",["Karena semua pengguna wajib membayar","Karena akses gratis dapat menarik pengguna lalu sebagian dikonversi menjadi pelanggan berbayar","Karena aplikasi tidak membutuhkan pendapatan","Karena iklan selalu lebih menguntungkan"],1,"Freemium menarik pengguna melalui akses gratis lalu menawarkan nilai tambahan berbayar."],
+["Sebuah bisnis digital ingin pendapatan yang lebih mudah diprediksi setiap bulan. Model mana yang paling sesuai jika pengguna bersedia membayar rutin?",["Subscription","Advertising","Commission","Marketplace"],0,"Subscription memberikan pembayaran berulang."],
+["Sebuah platform transaksi memiliki jumlah transaksi tinggi, tetapi pengguna tidak mau membayar biaya bulanan. Model yang lebih sesuai adalah...",["Commission","Subscription","Freemium","Advertising"],0,"Commission mengambil pendapatan dari transaksi."],
+["Sebuah platform memiliki pengguna sangat banyak, tetapi pengguna premium rendah. Platform juga memiliki audiens menarik bagi brand. Strategi pendapatan yang paling logis adalah...",["Menghapus versi gratis","Menggabungkan freemium dengan advertising","Mengubah semuanya menjadi marketplace","Tidak mencari pendapatan"],1,"Platform dapat memperoleh pendapatan dari premium dan iklan."],
+["Sebuah marketplace ingin meningkatkan pendapatan tanpa menaikkan biaya berlangganan penjual. Pilihan yang paling langsung terkait aktivitas transaksi adalah...",["Commission per transaction","Menghapus katalog","Mengurangi jumlah pembeli","Membuat semua produk gratis"],0,"Commission mengikuti transaksi yang terjadi."],
+["Sebuah bisnis menawarkan aplikasi gratis, tetapi hampir semua fitur penting dikunci sampai pengguna membayar. Apa yang perlu dievaluasi agar freemium tetap menarik?",["Apakah versi gratis masih memberikan nilai yang cukup untuk menarik pengguna","Apakah logo menggunakan warna emas","Apakah kantor memiliki banyak meja","Apakah nama aplikasi pendek"],0,"Versi gratis harus cukup bernilai untuk menarik pengguna."],
+["Dua bisnis sama-sama memiliki banyak pengguna. Bisnis A memiliki transaksi langsung antar pengguna. Bisnis B memiliki audiens besar yang menarik bagi brand. Model pendapatan yang paling logis adalah...",["A: Commission; B: Advertising","A: Advertising; B: Commission","A: Subscription; B: Marketplace","A: Freemium; B: Commission"],0,"Model pendapatan disesuaikan dengan aktivitas dan nilai masing-masing bisnis."]
+ ,
+["SUDDEN DEATH: Dua platform memiliki jumlah pengguna yang sama. Platform X menghasilkan uang dari iklan yang relevan, sedangkan Platform Y hanya mengandalkan pengguna gratis tanpa iklan atau fitur premium. Kesimpulan paling tepat adalah...",["Keduanya pasti memiliki pendapatan yang sama","Platform X memiliki jalur monetisasi yang lebih jelas","Platform Y pasti lebih menguntungkan","Jumlah pengguna saja cukup untuk menentukan keuntungan"],1,"Dalam bisnis digital, jumlah pengguna belum otomatis menghasilkan pendapatan. Model monetisasi yang jelas membantu platform mengubah penggunaan menjadi pendapatan."]
+];
+const DEMO_QUESTIONS = JSON.parse(JSON.stringify(QUESTIONS));
+const QUESTION_PACK_KEY = "miniQuizBattleQuestionPackV1";
+
+function validateQuestionPack(pack){
+  if(!Array.isArray(pack) || pack.length !== 21) {
+    throw new Error("Paket harus berisi tepat 21 soal: 5 Round 1, 5 Round 2, 10 Grand Final, dan 1 Sudden Death.");
+  }
+  pack.forEach((q,i)=>{
+    if(!Array.isArray(q) || q.length < 4 || typeof q[0] !== "string" || !q[0].trim()) {
+      throw new Error(`Soal ${i+1}: teks pertanyaan belum benar.`);
+    }
+    if(!Array.isArray(q[1]) || q[1].length !== 4 || q[1].some(v=>typeof v!=="string"||!v.trim())) {
+      throw new Error(`Soal ${i+1}: harus memiliki tepat 4 pilihan jawaban.`);
+    }
+    if(!Number.isInteger(q[2]) || q[2] < 0 || q[2] > 3) {
+      throw new Error(`Soal ${i+1}: indeks jawaban benar harus 0, 1, 2, atau 3.`);
+    }
+    if(typeof q[3] !== "string") q[3] = String(q[3] ?? "");
+  });
+  return pack;
+}
+function getQuestionPack(){
+  try {
+    const saved=localStorage.getItem(QUESTION_PACK_KEY);
+    if(saved) return validateQuestionPack(JSON.parse(saved));
+  } catch(e) { console.warn("Saved question pack could not be loaded:",e); }
+  return QUESTIONS;
+}
+function loadQuestionEditor(){
+  const el=$("questionPackEditor");
+  if(el) el.value=JSON.stringify(getQuestionPack(),null,2);
+}
+function saveQuestionPack(){
+  try {
+    const parsed=validateQuestionPack(JSON.parse($("questionPackEditor").value));
+    localStorage.setItem(QUESTION_PACK_KEY,JSON.stringify(parsed));
+    QUESTIONS=parsed;
+    $("questionPackStatus").textContent="✓ Question pack saved in this browser. New battles will use this pack.";
+    $("questionPackStatus").style.background="#e5f5e9";
+    $("questionPackStatus").style.color="#17633a";
+  } catch(e) {
+    $("questionPackStatus").textContent="Belum tersimpan: "+(e?.message||e);
+    $("questionPackStatus").style.background="#fff0ed";
+    $("questionPackStatus").style.color="#9b1c31";
+  }
+}
+function restoreDemoQuestions(){
+  QUESTIONS=JSON.parse(JSON.stringify(DEMO_QUESTIONS));
+  localStorage.removeItem(QUESTION_PACK_KEY);
+  loadQuestionEditor();
+  $("questionPackStatus").textContent="Demo questions restored. Save or create a new battle to use them.";
+  $("questionPackStatus").style.background="#f6edd9";
+  $("questionPackStatus").style.color="#6c4b42";
+}
+function questionsForGame(g){return Array.isArray(g?.questions)&&g.questions.length===21?g.questions:QUESTIONS;}
+
+let app,auth,db,user=null,gameCode=null,playerId=null,role=null,gameUnsub=null;
+let local={selected:null,submitted:false,lastQuestion:-1};
+const TEAMS=["A","B","C","D"];
+const $=id=>document.getElementById(id);
+const stageOf=i=>i<5?1:i<10?2:3;
+const roundName=s=>s===1?"ROUND 1 — QUALIFIER":s===2?"ROUND 2 — QUALIFIER":"ROUND 3 — GRAND FINAL";
+const qNumber=i=>stageOf(i)===1?i+1:stageOf(i)===2?i-4:i-9;
+function configured(){return firebaseConfig.apiKey.startsWith("AIza") && !firebaseConfig.databaseURL.includes("PASTE_")}
+function show(id){["home","host","player","result"].forEach(x=>$(x).classList.add("hidden"));$(id).classList.remove("hidden")}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function activeTeams(g){
+ if(g?.suddenDeath&&Array.isArray(g?.suddenDeathTeams)&&g.suddenDeathTeams.length===2)return g.suddenDeathTeams;
+ const stage=Number(g?.stage||1);
+ if(stage===1)return ["A","B"];
+ if(stage===2)return ["C","D"];
+ const f=g?.finalists||{};
+ return [f.left,f.right].filter(Boolean);
+}
+function teamLabel(g,t){
+ if(!t)return "—";
+ return g?.teams?.[t]?.name || ("TEAM "+t);
+}
+function currentScores(g){
+ const pair=activeTeams(g);
+ const a=pair[0],b=pair[1];
+ return [teamLabel(g,a),Number(g?.teams?.[a]?.score||0),teamLabel(g,b),Number(g?.teams?.[b]?.score||0)];
+}
+function stageWinner(g,stage){
+ const pair=stage===1?["A","B"]:["C","D"];
+ const a=Number(g?.teams?.[pair[0]]?.score||0);
+ const b=Number(g?.teams?.[pair[1]]?.score||0);
+ if(a===b)return null;
+ return a>b?pair[0]:pair[1];
+}
+
+if(!configured()){$("configNotice").textContent="Firebase belum dikonfigurasi. Nanti isi API key dari Firebase Console pada bagian firebaseConfig.";$('configNotice').classList.remove('hidden')}
+else{app=initializeApp(firebaseConfig);auth=getAuth(app);db=getDatabase(app);signInAnonymously(auth).catch(e=>showConfigError(e))}
+function showConfigError(e){$("configNotice").textContent="Firebase Auth gagal: "+e.message;$("configNotice").classList.remove("hidden")}
+onAuthStateChanged(auth,u=>{user=u});
+
+async function createGame(){
+ if(!configured())return alert("Firebase belum dikonfigurasi. Isi API key terlebih dahulu."); if(!user)return alert("Tunggu koneksi Firebase siap.");
+ gameCode=String(Math.floor(100000+Math.random()*900000));
+ const chosenQuestions=validateQuestionPack(JSON.parse(JSON.stringify(getQuestionPack()))); QUESTIONS=chosenQuestions; const data={hostUid:user.uid,questions:chosenQuestions,status:"round1",stage:1,questionIndex:0,questionState:"waiting",startedAt:0,teams:{A:{name:"TEAM A",score:0},B:{name:"TEAM B",score:0},C:{name:"TEAM C",score:0},D:{name:"TEAM D",score:0}},finalists:{left:null,right:null},winners:{round1:null,round2:null},players:{},answers:{},createdAt:serverTimestamp()};
+ await set(ref(db,"games/"+gameCode),data);role="host";show("host");listenGame();
+}
+async function joinGame(){
+ if(!configured())return alert("Firebase belum dikonfigurasi."); if(!user)return alert("Tunggu koneksi Firebase siap.");
+ const code=$("joinCode").value.trim(),team=$("joinTeam").value,name=$("joinName").value.trim();if(!code||!name)return alert("Isi Game Code dan nama.");
+ const snap=await get(ref(db,"games/"+code));if(!snap.exists())return alert("Game Code tidak ditemukan.");const g=snap.val();
+ if(g.status==="finished")return alert("Game sudah selesai.");gameCode=code;role="player";playerId=user.uid;
+ await set(ref(db,`games/${gameCode}/players/${playerId}`),{uid:user.uid,name,team,joinedAt:serverTimestamp()});local={selected:null,submitted:false,lastQuestion:-1};show("player");$("playerTeam").textContent=teamLabel(g,team);listenGame();
+}
+function listenGame(){if(gameUnsub)gameUnsub();gameUnsub=onValue(ref(db,"games/"+gameCode),snap=>{const g=snap.val();if(!g)return;role==="host"?renderHost(g):renderPlayer(g)})}
+
+function renderHost(g){
+ if(g?.status==="finished"){
+   const f=g?.finalists||{};
+   const a=f.left,b=f.right;
+   const sa=Number(g?.teams?.[a]?.score||0),sb=Number(g?.teams?.[b]?.score||0);
+   $("finalScore").textContent=`${teamLabel(g,a)}: ${sa} — ${teamLabel(g,b)}: ${sb}`;
+   const champion=g?.winners?.champion||(sa>sb?a:sb>sa?b:null);
+   $("winner").textContent=champion?`🏆 ${teamLabel(g,champion)} MENANG — BATTLE CHAMPION!`:"⚡ HASIL AKHIR SERI";
+   show("result");
+   return;
+ }
+ const finalists=g?.finalists||{};
+ $("gameCode").textContent=gameCode||"—";
+ $("brA").textContent=teamLabel(g,"A");
+ $("brB").textContent=teamLabel(g,"B");
+ $("brC").textContent=teamLabel(g,"C");
+ $("brD").textContent=teamLabel(g,"D");
+ $("brF1").textContent=finalists.left?teamLabel(g,finalists.left):"Winner R1";
+ $("brF2").textContent=finalists.right?teamLabel(g,finalists.right):"Winner R2";
+ const [ln,ls,rn,rs]=currentScores(g);
+ $("leftTeamName").textContent=ln;$("scoreLeft").textContent=ls;
+ $("rightTeamName").textContent=rn;$("scoreRight").textContent=rs;
+ const i=Number(g?.questionIndex||0);
+ const stage=Number(g?.stage||1);
+ $("round").textContent=roundName(stage);
+ $("questionNo").textContent=g?.suddenDeath?"⚡ SUDDEN DEATH":`QUESTION ${qNumber(i)} / ${stage===3?10:5}`;
+ const active=activeTeams(g);
+ const ps=Object.values(g?.players||{}).filter(p=>active.includes(p.team));
+ const waiting=Object.values(g?.players||{}).filter(p=>!active.includes(p.team));
+ $("hostPlayers").innerHTML=(ps.length?ps.map(p=>`<span class="pill">${esc(teamLabel(g,p.team))} • ${esc(p.name)}</span>`).join(" "):"No active players yet")+(waiting.length?`<div class="mini" style="margin-top:8px">Waiting/eliminated: ${waiting.map(p=>esc(p.name)+" ("+esc(teamLabel(g,p.team))+")").join(", ")}</div>`:"");
+ const x=questionsForGame(g)[i];
+ if(!x){
+   $("hostQuestion").textContent="Tidak ada soal pada indeks ini.";
+   $("hostOptions").innerHTML="";
+   return;
+ }
+ $("hostQuestion").textContent=g.questionState==="active"||g.questionState==="revealed"?x[0]:"Ready to enter the arena? Press START QUESTION to begin.";
+ $("hostOptions").innerHTML=x[1].map((v,n)=>`<div class="opt ${g.questionState==="revealed"&&n===x[2]?"correct":""}">${"ABCD"[n]}. ${esc(v)}</div>`).join("");
+ updateTimer(g);
+ const ans=Object.values(g?.answers||{}).filter(a=>Number(a.questionIndex)===i&&active.includes(a.team));
+ $("answerTable").innerHTML=ans.map(a=>`<tr><td>${esc(teamLabel(g,a.team))}</td><td>${esc(a.name)}</td><td>${"ABCD"[a.answer]}</td><td>${a.elapsedMs!=null?(a.elapsedMs/1000).toFixed(2)+"s":"-"}</td><td>${Number(a.answer)===Number(x[2])?"✓ BENAR":"✕ SALAH"}</td></tr>`).join("");
+ if(g.questionState==="revealed"){
+  const letter="ABCD"[x[2]];
+  $("hostExplanation").className="explain answer-reveal";
+  $("hostExplanation").innerHTML=`<div class="reveal-kicker"><span class="sparkle">✨</span> Jawaban yang benar <span class="sparkle">✨</span></div><div class="reveal-choice">🏆 ${letter} <span aria-hidden="true">•</span> ${esc(x[1][x[2]])}</div><div class="reveal-text">MINI QUIZ BATTLE! 💰</div><div class="reveal-explanation">${esc(x[3])}</div>`;
+}else{
+  $("hostExplanation").className="explain hidden";
+  $("hostExplanation").innerHTML="";
+}
+ const last=(stage===1&&i===4)||(stage===2&&i===9)||(stage===3&&i>=19);
+ const resultBox=$("roundResult");
+ if(g.questionState==="revealed"&&(last||g.suddenDeath)){
+   resultBox.classList.remove("hidden");
+   if(g.suddenDeath){
+     const pair=activeTeams(g);
+     const a=Number(g?.teams?.[pair[0]]?.score||0);
+     const b=Number(g?.teams?.[pair[1]]?.score||0);
+     const winner=a===b?null:(a>b?pair[0]:pair[1]);
+     resultBox.innerHTML=`<div class="result-title">⚡ SUDDEN DEATH — SCORE</div><div class="result-score"><div class="result-team"><b>${esc(teamLabel(g,pair[0]))}</b><strong>${a}</strong></div><div style="font-weight:1000;font-size:26px">VS</div><div class="result-team"><b>${esc(teamLabel(g,pair[1]))}</b><strong>${b}</strong></div></div>${winner?`<div class="winner-banner"><div class="winner-kicker">⚡ SUDDEN DEATH WINNER ⚡</div><div class="winner-name">🏆 ${esc(teamLabel(g,winner))} 🏆</div><div class="winner-sub">MENANG PADA SOAL PENENTU! 🎉</div></div>`:`<div class="tie-banner">🤝 MASIH SERI!<br>Klik tombol untuk soal sudden death berikutnya.</div>`}`;
+   }else if(stage===1||stage===2){
+     const pair=stage===1?["A","B"]:["C","D"];
+     const a=Number(g?.teams?.[pair[0]]?.score||0);
+     const b=Number(g?.teams?.[pair[1]]?.score||0);
+     const winner=a===b?null:(a>b?pair[0]:pair[1]);
+     resultBox.innerHTML=`<div class="result-title">🏁 ${stage===1?"ROUND 1 — FINAL SCORE":"ROUND 2 — FINAL SCORE"}</div><div class="result-score"><div class="result-team"><b>${esc(teamLabel(g,pair[0]))}</b><strong>${a}</strong></div><div style="font-weight:1000;font-size:26px">VS</div><div class="result-team"><b>${esc(teamLabel(g,pair[1]))}</b><strong>${b}</strong></div></div>${winner?`<div class="winner-banner"><div class="winner-kicker">✨ QUALIFIED! ✨</div><div class="winner-name">🏆 ${esc(teamLabel(g,winner))} 🏆</div><div class="winner-sub">PEMENANG RONDE • LOLOS KE TAHAP BERIKUTNYA 🎉</div></div>`:`<div class="tie-banner">🤝 SKOR SERI! ⚡<br>Perlu satu soal sudden death untuk menentukan pemenang.</div>`}`;
+   }else{
+     const f=g?.finalists||{};
+     const a=Number(g?.teams?.[f.left]?.score||0),b=Number(g?.teams?.[f.right]?.score||0);
+     const winner=a===b?null:(a>b?f.left:f.right);
+     resultBox.innerHTML=`<div class="result-title">🏆 GRAND FINAL — FINAL SCORE</div><div class="result-score"><div class="result-team"><b>${esc(teamLabel(g,f.left))}</b><strong>${a}</strong></div><div style="font-weight:1000;font-size:26px">VS</div><div class="result-team"><b>${esc(teamLabel(g,f.right))}</b><strong>${b}</strong></div></div>${winner?`<div class="winner-banner"><div class="winner-kicker">👑 BATTLE CHAMPION 👑</div><div class="winner-name">🏆 ${esc(teamLabel(g,winner))} 🏆</div><div class="winner-sub">YOU OWNED THE ARENA! 🎉🏆</div></div>`:`<div class="tie-banner">🤝 GRAND FINAL SERI! ⚡<br>Perlu satu soal sudden death untuk menentukan champion.</div>`}`;
+   }
+ }else{
+   resultBox.classList.add("hidden");
+   resultBox.innerHTML="";
+ }
+ $("nextRoundBtn").style.display=(g.questionState==="revealed"&&(last||g.suddenDeath))?"inline-block":"none";
+ const pairForResult=g.suddenDeath?activeTeams(g):(stage===1?["A","B"]:stage===2?["C","D"]:[g?.finalists?.left,g?.finalists?.right]);
+ const tieAtEnd=(last||g.suddenDeath)&&g.questionState==="revealed"&&pairForResult[0]&&pairForResult[1]&&Number(g?.teams?.[pairForResult[0]]?.score||0)===Number(g?.teams?.[pairForResult[1]]?.score||0);
+ $("nextRoundBtn").textContent=g.suddenDeath?(tieAtEnd?"TIE AGAIN — SUDDEN DEATH":"CONFIRM SUDDEN DEATH WINNER"):tieAtEnd?"START SUDDEN DEATH":stage===1?"START ROUND 2":stage===2?"START GRAND FINAL":"END GAME";
+ $("nextRoundBtn").disabled=false;
+ $("hostStatus").textContent=g.questionState==="active"?"Teams are answering...":g.questionState==="revealed"?"Answer revealed — review the result.":"Ready.";
+}
+function updateTimer(g){let t=20;if(g.questionState==="active"&&g.startedAt){t=Math.max(0,20-Math.floor((Date.now()-g.startedAt)/1000))}$("hostTimer").textContent=t;$("playerTimer").textContent=t}
+setInterval(()=>{if(gameCode&&role)get(ref(db,"games/"+gameCode)).then(s=>{if(s.exists())updateTimer(s.val())}).catch(()=>{})},500);
+
+async function hostActionGuard(actionName){
+  if(!gameCode) throw new Error("Belum ada game aktif.");
+  if(!user) throw new Error("Firebase Auth belum siap. Tunggu sebentar lalu coba lagi.");
+  const snap=await get(ref(db,"games/"+gameCode));
+  if(!snap.exists()) throw new Error("Game tidak ditemukan di Firebase.");
+  const g=snap.val();
+  if(g.hostUid!==user.uid) throw new Error("Sesi ini bukan host game tersebut. Buat game baru dari perangkat dosen.");
+  return g;
+}
+
+async function refreshHost(){
+  const snap=await get(ref(db,"games/"+gameCode));
+  if(snap.exists()) renderHost(snap.val());
+}
+
+async function startQuestion(){
+ try{
+  const g=await hostActionGuard("START QUESTION");
+  if(g.questionState==="active"){
+    await refreshHost();
+    return;
+  }
+  if(g.questionState==="revealed"){
+    throw new Error("Jawaban soal sebelumnya sudah ditampilkan. Klik NEXT QUESTION untuk lanjut.");
+  }
+  await update(ref(db,"games/"+gameCode),{
+    questionState:"active",
+    startedAt:serverTimestamp()
+  });
+  await refreshHost();
+ }catch(e){
+  console.error(e);
+  alert("START QUESTION gagal: "+(e?.message||e));
+ }
+}
+
+async function revealAnswer(){
+ try{
+  const g=await hostActionGuard("SHOW ANSWER");
+
+  /* Idempotent: jika sudah revealed, jangan dianggap error.
+     Langsung tampilkan kondisi terbaru di layar host. */
+  if(g.questionState==="revealed"){
+    await refreshHost();
+    return;
+  }
+
+  if(g.questionState!=="active"){
+    throw new Error("Pertanyaan belum aktif. Klik START QUESTION terlebih dahulu.");
+  }
+
+  const i=g.questionIndex;
+  const x=questionsForGame(g)[i];
+  if(!x) throw new Error("Soal tidak ditemukan.");
+
+  const active=activeTeams(g);
+  const ans=Object.values(g.answers||{})
+    .filter(a=>Number(a.questionIndex)===Number(i)&&active.includes(a.team));
+
+  const updates={questionState:"revealed"};
+
+  const correct=ans
+    .filter(a=>Number(a.answer)===Number(x[2]))
+    .sort((a,b)=>Number(a.elapsedMs??999999)-Number(b.elapsedMs??999999));
+
+  const points={};
+  active.forEach(t=>points[t]=0);
+
+  /* Correct answer = +1 */
+  correct.forEach(a=>{
+    points[a.team]=(points[a.team]||0)+1;
+  });
+
+  /* Fastest correct answer = +1 bonus */
+  if(correct.length){
+    points[correct[0].team]=(points[correct[0].team]||0)+1;
+  }
+
+  active.forEach(t=>{
+    updates[`teams/${t}/score`]=
+      Number(g.teams?.[t]?.score||0)+Number(points[t]||0);
+  });
+
+  await update(ref(db,"games/"+gameCode),updates);
+  await refreshHost();
+
+ }catch(e){
+  console.error(e);
+  alert("SHOW ANSWER gagal: "+(e?.message||e));
+ }
+}
+
+async function nextQuestion(){
+ try{
+  const g=await hostActionGuard("NEXT QUESTION");
+
+  if(g.questionState!=="revealed"){
+    throw new Error("Tampilkan jawaban terlebih dahulu dengan SHOW ANSWER.");
+  }
+
+  if(
+    (g.stage===1&&g.questionIndex>=4) ||
+    (g.stage===2&&g.questionIndex>=9) ||
+    (g.stage===3&&g.questionIndex>=19)
+  ){
+    throw new Error("Ronde ini sudah selesai. Gunakan NEXT ROUND / END GAME.");
+  }
+
+  await update(ref(db,"games/"+gameCode),{
+    questionIndex:g.questionIndex+1,
+    questionState:"waiting",
+    startedAt:0
+  });
+  const review=document.getElementById("answerReview"); if(review) review.open=false;
+
+  await refreshHost();
+
+ }catch(e){
+  console.error(e);
+  alert("NEXT QUESTION gagal: "+(e?.message||e));
+ }
+}
+
+async function advanceStage(){
+ try{
+  const g=await hostActionGuard("NEXT ROUND");
+
+  if(g.questionState!=="revealed"){
+    throw new Error("Tampilkan jawaban terlebih dahulu dengan SHOW ANSWER.");
+  }
+
+  if(g.suddenDeath){
+    const pair=activeTeams(g);
+    const a=Number(g?.teams?.[pair[0]]?.score||0), b=Number(g?.teams?.[pair[1]]?.score||0);
+    if(a===b){
+      const clearAnswers={};
+      pair.forEach(t=>clearAnswers[`answers/${t}_20`]=null);
+      await update(ref(db,"games/"+gameCode),{
+        questionIndex:20,questionState:"waiting",startedAt:0,suddenDeath:true,suddenDeathTeams:pair,
+        ...clearAnswers
+      });
+      await refreshHost();
+      return;
+    }
+    const winner=a>b?pair[0]:pair[1];
+    const clearSD={"suddenDeath":false,"suddenDeathTeams":null};
+    if(g.stage===1){
+      await update(ref(db,"games/"+gameCode),{...clearSD,stage:2,status:"round2",questionIndex:5,questionState:"waiting",startedAt:0,"winners/round1":winner});
+    }else if(g.stage===2){
+      const r1=g?.winners?.round1;
+      await update(ref(db,"games/"+gameCode),{...clearSD,stage:3,status:"final",questionIndex:10,questionState:"waiting",startedAt:0,"winners/round2":winner,"finalists/left":r1,"finalists/right":winner,[`teams/${r1}/score`]:0,[`teams/${winner}/score`]:0});
+    }else{
+      await update(ref(db,"games/"+gameCode),{...clearSD,status:"finished",questionState:"revealed","winners/champion":winner});
+    }
+    await refreshHost();
+    return;
+  }
+
+  if(g.stage===1){
+    const w=stageWinner(g,1);
+    if(!w){
+      await update(ref(db,"games/"+gameCode),{suddenDeath:true,suddenDeathTeams:["A","B"],questionIndex:20,questionState:"waiting",startedAt:0});
+      await refreshHost(); return;
+    }
+
+    await update(ref(db,"games/"+gameCode),{
+      stage:2,
+      status:"round2",
+      questionIndex:5,
+      questionState:"waiting",
+      startedAt:0,
+      "winners/round1":w
+    });
+    await refreshHost();
+    return;
+  }
+
+  if(g.stage===2){
+    const w=stageWinner(g,2);
+    if(!w){
+      await update(ref(db,"games/"+gameCode),{suddenDeath:true,suddenDeathTeams:["C","D"],questionIndex:20,questionState:"waiting",startedAt:0});
+      await refreshHost(); return;
+    }
+
+    await update(ref(db,"games/"+gameCode),{
+      stage:3,
+      status:"final",
+      questionIndex:10,
+      questionState:"waiting",
+      startedAt:0,
+      "winners/round2":w,
+      "finalists/left":g.winners.round1,
+      "finalists/right":w,
+      [`teams/${g.winners.round1}/score`]:0,
+      [`teams/${w}/score`]:0
+    });
+    await refreshHost();
+    return;
+  }
+
+  const f=g?.finalists||{};
+  const fa=Number(g?.teams?.[f.left]?.score||0), fb=Number(g?.teams?.[f.right]?.score||0);
+  if(fa===fb){
+    await update(ref(db,"games/"+gameCode),{suddenDeath:true,suddenDeathTeams:[f.left,f.right],questionIndex:20,questionState:"waiting",startedAt:0});
+  }else{
+    await update(ref(db,"games/"+gameCode),{status:"finished",questionState:"revealed","winners/champion":fa>fb?f.left:f.right});
+  }
+  await refreshHost();
+
+ }catch(e){
+  console.error(e);
+  alert("NEXT ROUND gagal: "+(e?.message||e));
+ }
+}
+
+async function resetGame(){
+ try{
+  if(!confirm("Reset game?")) return;
+  if(!gameCode) return location.reload();
+  await hostActionGuard("RESET GAME");
+  await remove(ref(db,"games/"+gameCode));
+  location.reload();
+ }catch(e){
+  console.error(e);
+  alert("RESET GAME gagal: "+(e?.message||e));
+ }
+}
+
+function renderPlayer(g){
+ if(g.status==="finished"){show("result");const f=g?.finalists||{};const a=f.left,b=f.right;const sa=Number(g?.teams?.[a]?.score||0),sb=Number(g?.teams?.[b]?.score||0);$("finalScore").textContent=`${teamLabel(g,a)}: ${sa} — ${teamLabel(g,b)}: ${sb}`;const champion=g?.winners?.champion||(sa>sb?a:sb>sa?b:null);$("winner").textContent=champion?`🏆 ${teamLabel(g,champion)} MENANG — BATTLE CHAMPION!`:"⚡ HASIL AKHIR SERI";return}
+ const active=activeTeams(g);const myTeam=g.players?.[playerId]?.team;if(!active.includes(myTeam)){$("playerStatus").textContent=g.stage===3?"WAITING — TEAM ELIMINATED":"WAITING FOR NEXT ROUND";$('playerNotice').textContent="Tim Anda belum bermain pada ronde ini. Tunggu hasil ronde dan Grand Final.";$('playerQuestion').textContent="WAITING...";$('playerOptions').innerHTML="";$('playerMessage').textContent="Tunggu ronde berikutnya.";return}
+ $("playerTeam").textContent=teamLabel(g,myTeam);const i=g.questionIndex||0,x=questionsForGame(g)[i];if(local.lastQuestion!==i){local.selected=null;local.submitted=false;local.lastQuestion=i}
+ $("playerQuestion").textContent=g.questionState==="active"?x[0]:"Menunggu dosen memulai pertanyaan...";
+ const teamAnswer=g.answers?.[`${myTeam}_${i}`];local.submitted=!!teamAnswer;
+ if(g.questionState==="active"&&!teamAnswer){$("playerOptions").innerHTML=x[1].map((v,n)=>`<button class="opt ${local.selected===n?"sel":""}" onclick="selectAnswer(${n})">${"ABCD"[n]}. ${esc(v)}</button>`).join("")+`<button class="btn primary" style="grid-column:1/-1" onclick="submitAnswer()">LOCK ANSWER</button>`;$("playerMessage").textContent="Pilih jawaban. Anggota pertama dari tim yang mengunci akan menjadi jawaban tim."}
+ else {$("playerOptions").innerHTML="";$("playerMessage").textContent=teamAnswer?`TEAM ANSWER LOCKED ✓ — ${"ABCD"[teamAnswer.answer]}`:"Waiting for Host..."}
+}
+function selectAnswer(n){local.selected=n;get(ref(db,"games/"+gameCode)).then(s=>s.exists()&&renderPlayer(s.val()))}
+async function submitAnswer(){
+ if(local.selected===null||local.submitted)return;const s=await get(ref(db,"games/"+gameCode));const g=s.val();if(!g||g.questionState!=="active")return;const team=g.players?.[user.uid]?.team;if(!activeTeams(g).includes(team))return;const key=`${team}_${g.questionIndex}`;
+ const answerRef=ref(db,`games/${gameCode}/answers/${key}`);const result=await runTransaction(answerRef,current=>current===null?{uid:user.uid,name:g.players[user.uid].name,team,answer:local.selected,questionIndex:g.questionIndex,elapsedMs:Math.max(0,Date.now()-g.startedAt),submittedAt:serverTimestamp()}:current);
+ if(result.committed)local.submitted=true;renderPlayer(g);
+}
+[
+ ["startQuestionBtn",startQuestion],["revealAnswerBtn",revealAnswer],["nextQuestionBtn",nextQuestion],["nextRoundBtn",advanceStage],["resetGameBtn",resetGame]
+].forEach(([id,fn])=>{const el=$(id);if(el)el.addEventListener("click",fn);});
+
+$("saveQuestionPackBtn")?.addEventListener("click",saveQuestionPack);
+$("resetQuestionPackBtn")?.addEventListener("click",restoreDemoQuestions);
+loadQuestionEditor();
+window.createGame=createGame;window.joinGame=joinGame;window.startQuestion=startQuestion;window.revealAnswer=revealAnswer;window.nextQuestion=nextQuestion;window.advanceStage=advanceStage;window.resetGame=resetGame;window.selectAnswer=selectAnswer;window.submitAnswer=submitAnswer;
+</script></body></html>
